@@ -1,0 +1,285 @@
+/* Cyberpunk CSS for Job Search App */
+
+/* Glitch text effect */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text .glitch-offset {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-1px, 1px);
+  z-index: -1;
+}
+
+/* Neon borders and glows */
+.neon-border-blue {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 
+              inset 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+.neon-border-red {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 
+              inset 0 0 8px rgba(239, 68, 68, 0.3);
+}
+
+.neon-border-green {
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.5), 
+              inset 0 0 8px rgba(74, 222, 128, 0.3);
+}
+
+/* Animated gradient backgrounds */
+.cyberpunk-gradient {
+  background: linear-gradient(
+    -45deg, 
+    rgba(59, 130, 246, 0.3), 
+    rgba(139, 92, 246, 0.3), 
+    rgba(236, 72, 153, 0.3),
+    rgba(34, 211, 238, 0.3)
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Scanning line animation */
+.scan-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-line::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(
+    to bottom,
+    rgba(59, 130, 246, 0) 0%,
+    rgba(59, 130, 246, 0.5) 50%,
+    rgba(59, 130, 246, 0) 100%
+  );
+  opacity: 0.7;
+  animation: scan 3s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+
+/* Terminal-like typing animation */
+.typing-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 3s steps(40, end);
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Flicker animation */
+.flicker {
+  animation: flicker 8s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 1;
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.5;
+  }
+}
+
+/* Noise overlay */
+.noise {
+  position: relative;
+}
+
+.noise::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.05;
+  z-index: 10;
+}
+
+/* Heart beat animation */
+.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Color cycling */
+.color-cycle {
+  animation: color-cycle 10s linear infinite;
+}
+
+@keyframes color-cycle {
+  0% { color: #3b82f6; }
+  25% { color: #8b5cf6; }
+  50% { color: #ec4899; }
+  75% { color: #22d3ee; }
+  100% { color: #3b82f6; }
+}
+
+/* Digital distortion */
+.digital-distort {
+  animation: digital-distort 8s linear infinite;
+}
+
+@keyframes digital-distort {
+  0%, 92%, 100% {
+    transform: translate(0);
+    text-shadow: 0 0 3px rgba(59, 130, 246, 0.6);
+  }
+  92.5% {
+    transform: translate(-1px, 1px);
+    text-shadow: -1px 0 0 rgba(255, 0, 0, 0.4), 1px 0 0 rgba(0, 255, 255, 0.4);
+  }
+  93% {
+    transform: translate(1px, -1px);
+    text-shadow: -1px 0 0 rgba(0, 255, 255, 0.4), 1px 0 0 rgba(255, 0, 0, 0.4);
+  }
+  93.5% {
+    transform: translate(-1px, 0);
+  }
+  94% {
+    transform: translate(1px, 0);
+  }
+}
+
+/* Background styling for the app */
+.cyberpunk-bg {
+  background-color: #0a0e17;
+  background-image: 
+    linear-gradient(0deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center center;
+}
+
+/* Scanner animation */
+@keyframes scanner {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(200%) skewX(-12deg); }
+}
+
+.animate-scanner {
+  animation: scanner 3s ease-in-out infinite;
+}
+
+/* Terminal-style input */
+.terminal-input {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: rgba(59, 130, 246, 0.9);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+  caret-color: rgba(59, 130, 246, 0.9);
+}
+
+.terminal-input:focus {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Data processing indicator */
+.data-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  margin-right: 6px;
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.8);
+  animation: data-blink 1s infinite alternate;
+}
+
+@keyframes data-blink {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* Fade-in animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin 2s linear infinite reverse;
+}
+
+.animate-ping-slow {
+  animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}

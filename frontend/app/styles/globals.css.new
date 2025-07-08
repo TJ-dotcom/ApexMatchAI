@@ -1,0 +1,180 @@
+/* filepath: c:\Users\ideal\JS_2.0\job_search_app\frontend\src\styles\globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+html, body {
+  background: linear-gradient(135deg, #EEF2FF 0%, #F9FAFB 50%, #EFF6FF 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Custom utility classes */
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  border: 1px solid #f3f4f6;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-hover {
+  transition: all 0.3s;
+}
+
+.card-hover:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-0.25rem);
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background-color: #4F46E5;
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #4338CA;
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #F9FAFB, 0 0 0 4px #6366F1;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background-color: #E5E7EB;
+  color: #1F2937;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #D1D5DB;
+}
+
+.btn-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #F9FAFB, 0 0 0 4px #9CA3AF;
+}
+
+.btn-success {
+  padding: 0.5rem 1rem;
+  background-color: #10B981;
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+}
+
+.btn-success:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #F9FAFB, 0 0 0 4px #10B981;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #D1D5DB;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #F9FAFB, 0 0 0 4px #6366F1;
+  border-color: #6366F1;
+}
+
+.glass-effect {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 1.5rem;
+}
+
+/* Animation for progress bar */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes fade-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-progress {
+  animation: progress 30s linear forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.6s ease-out forwards;
+}
+
+/* Staggered animations for result cards */
+.stagger-card:nth-child(1) { animation-delay: 0.1s; }
+.stagger-card:nth-child(2) { animation-delay: 0.2s; }
+.stagger-card:nth-child(3) { animation-delay: 0.3s; }
+.stagger-card:nth-child(4) { animation-delay: 0.4s; }
+.stagger-card:nth-child(5) { animation-delay: 0.5s; }
