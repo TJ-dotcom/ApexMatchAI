@@ -39,42 +39,71 @@ def fetch_url(url: str, proxies: Dict[str, str] = None) -> str:
         logger.error(f"Request failed: {e}")
         raise
 
-def scrape_jobs(url: str, proxies: Dict[str, str] = None) -> List[Dict[str, Any]]:
-    """
-    Scrape job listings from the given URL with advanced anonymity
-    
-    Args:
-        url: URL of the job listing page
-        
-    Returns:
-        List of dictionaries containing job details
-    """
-    logger.info(f"Starting job scraping from URL: {url}")
-    max_retries = 5  # Increased from 3 to 5 for more persistence
-    retry_count = 0
-    driver = None
-    
-    while retry_count < max_retries:
-        try:
-            html_content = fetch_url(url, proxies)
-            soup = BeautifulSoup(html_content, "html.parser")
+import httpx
+from urllib.parse import urljoin
 
-            # Example: Extract job titles and links
-            jobs = []
-            for job_card in soup.select(".job-card-selector"):  # Replace with stable CSS selector
-                title = job_card.select_one(".job-title-selector").text.strip()
-                link = job_card.select_one("a")['href']
-                jobs.append({"title": title, "link": link})
+def scrape_jobs(url: str) -> List[Dict[str, Any]]:
+    """
+    Scrape job listings from the given URL.
+    This function will delegate to a site-specific parser.
+    """
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+        response = httpx.get(url, headers=headers, timeout=20)
+        response.raise_for_status()
+        html_content = response.text
 
-            return jobs
-        except Exception as e:
-            logger.error(f"Failed to scrape jobs: {e}")
+        if "linkedin.com" in url:
+            logger.info("Using LinkedIn parser")
+            return parse_linkedin(html_content, url)
+        elif "indeed.com" in url:
+            logger.info("Using Indeed parser")
+            return parse_indeed(html_content, url)
+        elif "hiringcafe.com" in url:
+            logger.info("Using HiringCafe parser")
+            return parse_hiringcafe(html_content, url)
+        elif "moaijobs.com" in url:
+            logger.info("Using Moaijobs parser")
+            return parse_moaijobs(html_content, url)
+        else:
+            logger.warning(f"No specific parser for URL: {url}")
             return []
-            
-        finally:
-            if driver:
-                logger.info("Closing Chrome driver")
-                driver.quit()
+
+    except httpx.RequestError as e:
+        logger.error(f"Request failed for {url}: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"An error occurred during scraping: {e}")
+        return []
+def parse_hiringcafe(html_content: str, base_url: str) -> List[Dict[str, Any]]:
+    """Parse HiringCafe job listings."""
+    soup = BeautifulSoup(html_content, 'html.parser')
+    jobs = []
+    job_cards = soup.select(".card.job-card")
+    for card in job_cards:
+        title = card.select_one("h2.job-title").get_text(strip=True) if card.select_one("h2.job-title") else "N/A"
+        company = card.select_one(".job-company").get_text(strip=True) if card.select_one(".job-company") else "N/A"
+        location = card.select_one(".job-location").get_text(strip=True) if card.select_one(".job-location") else "N/A"
+        job_url_element = card.select_one("a.job-link")
+        job_url = urljoin(base_url, job_url_element['href']) if job_url_element else base_url
+        description = card.select_one(".job-description").get_text(strip=True) if card.select_one(".job-description") else ""
+        jobs.append({"title": title, "company": company, "location": location, "url": job_url, "description": description})
+    return jobs
+
+def parse_moaijobs(html_content: str, base_url: str) -> List[Dict[str, Any]]:
+    """Parse Moaijobs job listings."""
+    soup = BeautifulSoup(html_content, 'html.parser')
+    jobs = []
+    job_cards = soup.select(".job-list-item")
+    for card in job_cards:
+        title = card.select_one(".job-title").get_text(strip=True) if card.select_one(".job-title") else "N/A"
+        company = card.select_one(".company-name").get_text(strip=True) if card.select_one(".company-name") else "N/A"
+        location = card.select_one(".job-location").get_text(strip=True) if card.select_one(".job-location") else "N/A"
+        job_url_element = card.select_one("a")
+        job_url = urljoin(base_url, job_url_element['href']) if job_url_element else base_url
+        description = card.select_one(".job-description").get_text(strip=True) if card.select_one(".job-description") else ""
+        jobs.append({"title": title, "company": company, "location": location, "url": job_url, "description": description})
+    return jobs
     
 def parse_indeed(html_content: str, base_url: str) -> List[Dict[str, Any]]:
     """Parse Indeed job listings"""

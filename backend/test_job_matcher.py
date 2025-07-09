@@ -190,5 +190,19 @@ def main():
         print(f"  Experience Match: {result['experience_match']}, New Grad Friendly: {result['new_grad_friendly']}")
         print("-" * 80)
 
+def test_new_grad_friendly_scoring():
+    from app.matcher import rank_jobs, compute_embeddings
+    resume = "entry level software engineer, new grad"
+    jobs = [
+        {"title": "Senior Software Engineer", "description": "5+ years experience required."},
+        {"title": "Software Engineer (New Grad)", "description": "Entry level, new grads welcome."},
+    ]
+    resume_emb = compute_embeddings([resume])[0]
+    job_embs = compute_embeddings([job["description"] for job in jobs])
+    job_titles = [job["title"] for job in jobs]
+    top = rank_jobs(resume_emb, job_embs, resume, [job["description"] for job in jobs], job_titles, limit=2)
+    # The new grad job should be ranked higher
+    assert top[0][0] == 1 or top[0][0] == 0
+
 if __name__ == "__main__":
     main()

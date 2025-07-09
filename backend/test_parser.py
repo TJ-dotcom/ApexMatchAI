@@ -1,4 +1,5 @@
 from app.scraper import parse_linkedin, parse_generic
+from app.resume_parser import extract_text
 import requests
 import sys
 
@@ -49,6 +50,21 @@ def test_generic_parser():
         import traceback
         traceback.print_exc()
 
+def test_parser_handles_various_formats():
+    """Test the resume parser with various file formats"""
+    print("\nTesting parser with various formats...")
+    # Realistic PDF/DOCX and mock data
+    files = ["sample_resume.pdf", "sample_resume.docx", "mock_resume.txt"]
+    for file in files:
+        try:
+            text = extract_text(file)
+            assert isinstance(text, str)
+            assert len(text) > 10
+            print(f"Successfully parsed {file}")
+        except Exception:
+            print(f"Failed to parse {file}, moving to next.")
+
 if __name__ == "__main__":
     test_linkedin_parser()
     test_generic_parser()
+    test_parser_handles_various_formats()

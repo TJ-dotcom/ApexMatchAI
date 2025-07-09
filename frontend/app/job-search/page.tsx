@@ -3,9 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Upload from "lucide-react/dist/esm/icons/upload.js"
 import Search from "lucide-react/dist/esm/icons/search.js"
@@ -18,6 +23,13 @@ import Download from "lucide-react/dist/esm/icons/download.js"
 import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle.js"
 import Heart from "lucide-react/dist/esm/icons/heart.js"
 import { cn } from "@/lib/utils"
+import {
+  CyberpunkButton,
+  CyberpunkProgress,
+  CyberpunkResultCard,
+  CyberpunkToaster,
+  toast,
+} from "@/components/ui"
 
 interface Job {
   id: string
@@ -360,6 +372,8 @@ export default function JobSearchTool() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      <CyberpunkToaster />
+
       {/* Military Radar - Background when not loading */}
       {!isLoading && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -546,10 +560,10 @@ export default function JobSearchTool() {
                 </div>
 
                 {/* Launch Button */}
-                <Button
+                <CyberpunkButton
                   onClick={handleSearch}
                   disabled={!resume || !jobUrl}
-                  className="w-full h-20 text-xl font-black bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 hover:from-orange-400 hover:via-red-400 hover:to-orange-500 text-white border-0 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/25 disabled:transform-none disabled:opacity-50 disabled:cursor-not-allowed font-mono tracking-wider relative overflow-hidden group"
+                  className="w-full h-20 text-xl font-black bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 hover:from-orange-400 hover:via-red-400 hover:to-orange-500 text-white border-0 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/25 disabled:transform-none disabled:opacity-50 disabled:cursor-not-allowed font-mono tracking-wider relative overflow-hidden"
                 >
                   <div className="flex items-center gap-4 relative z-10">
                     <Target className="h-8 w-8 animate-pulse" />
@@ -557,7 +571,7 @@ export default function JobSearchTool() {
                     <Zap className="h-8 w-8 animate-pulse" />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                </Button>
+                </CyberpunkButton>
               </CardContent>
             </Card>
           </div>
@@ -654,100 +668,26 @@ export default function JobSearchTool() {
                 {jobs.length} HIGH-VALUE OPPORTUNITIES DETECTED • RANKED BY SURVIVAL PROBABILITY
               </p>
               <div className="flex justify-center gap-6">
-                <Button
+                <CyberpunkButton
                   onClick={resetSearch}
-                  variant="outline"
                   className="border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black transition-all duration-300 font-mono font-bold"
                 >
                   NEW MISSION
-                </Button>
-                <Button className="bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-400 hover:to-green-400 text-black font-mono font-bold">
+                </CyberpunkButton>
+                <CyberpunkButton className="bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-400 hover:to-green-400 text-black font-mono font-bold">
                   <Download className="h-4 w-4 mr-2" />
                   EXTRACT DATA
-                </Button>
+                </CyberpunkButton>
               </div>
             </div>
 
             <div className="grid gap-8">
               {jobs.map((job, index) => (
-                <Card
+                <CyberpunkResultCard
                   key={job.id}
-                  className="bg-gray-900/80 backdrop-blur-xl border-orange-600/30 hover:border-orange-400/60 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-orange-500/20 group border-2"
-                  style={{ animationDelay: `${index * 200}ms` }}
-                >
-                  <CardContent className="p-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                      <div className="flex-1 space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-3">
-                              <h3 className="text-2xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300 font-mono">
-                                {job.title}
-                              </h3>
-                              <Badge
-                                className={cn(
-                                  "text-xs font-bold px-2 py-1 border font-mono",
-                                  getDifficultyColor(job.difficulty),
-                                )}
-                              >
-                                {job.difficulty.toUpperCase()}
-                              </Badge>
-                            </div>
-                            <p className="text-xl text-gray-300 font-bold font-mono">[{job.company}]</p>
-                          </div>
-                          <Badge
-                            className={cn(
-                              "text-lg font-black px-4 py-2 bg-gradient-to-r text-black border-0 font-mono",
-                              getMatchColor(job.matchScore),
-                            )}
-                          >
-                            {job.matchScore}% MATCH
-                          </Badge>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-6 text-gray-400 font-mono">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-orange-400" />
-                            <span className="font-bold">{job.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-lime-400" />
-                            <span className="font-bold">{job.salary}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-5 w-5 text-red-400" />
-                            <span className="font-bold">{job.postedDate}</span>
-                          </div>
-                          <Badge variant="outline" className="border-gray-600 text-gray-300 font-mono font-bold">
-                            {job.type}
-                          </Badge>
-                        </div>
-
-                        <p className="text-gray-300 text-lg leading-relaxed font-mono">{job.description}</p>
-                      </div>
-
-                      <div className="flex flex-col items-center gap-4 lg:items-end">
-                        <div className="text-center lg:text-right space-y-3">
-                          <div className="flex items-center gap-3">
-                            {renderHearts(job.matchScore)}
-                            <div
-                              className={cn(
-                                "text-3xl font-black bg-gradient-to-r bg-clip-text text-transparent font-mono",
-                                getMatchColor(job.matchScore),
-                              )}
-                            >
-                              {job.matchScore}%
-                            </div>
-                          </div>
-                          <div className="text-gray-400 font-bold font-mono">COMPATIBILITY</div>
-                        </div>
-                        <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white font-black px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 font-mono tracking-wider">
-                          GET THEM
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  job={{ ...job, score: job.matchScore }} // Map job.matchScore to score prop
+                  index={index}
+                />
               ))}
             </div>
           </div>

@@ -1,127 +1,29 @@
 # Job Search Resume Matcher
 
-A web application that matches job postings from a provided URL to a user's resume using natural language processing and semantic similarity.
+Welcome! This project helps you find jobs that truly fit your resume—automatically.
 
-## Features
+## Why?
+Job hunting is overwhelming. We built this tool to save you time and help you discover the best-matching jobs for your unique skills, using real natural language understanding (not just keyword matching).
 
-- Upload PDF or DOCX resumes
-- Scrape job listings from various job posting websites
-- Extract skills and keywords from resumes
-- Compute semantic similarity between resume and job listings
-- Rank job listings based on match score
-- Download results as CSV
+## What does it do?
+- Upload your resume (PDF or DOCX)
+- Paste a job listings URL (e.g., LinkedIn, Indeed)
+- The app scrapes, analyzes, and ranks jobs by how well they match your experience
+- Download your results as a CSV
 
-## Tech Stack
+## How does it work?
+We use modern NLP (spaCy, Sentence Transformers) to extract and compare skills, and a fast web UI (Next.js + React) for a smooth experience.
 
-### Frontend
-- React with TypeScript
-- Next.js for server-side rendering
-- Tailwind CSS for styling
-- Axios for API requests
+## Quick Start
+See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for full installation and troubleshooting instructions.
 
-### Backend
-- FastAPI for REST API
-- PyPDF2/python-docx for resume parsing
-- spaCy for natural language processing
-- Sentence-Transformers for semantic embeddings
+## Who is this for?
+Anyone who wants to cut through the noise and find jobs that actually fit—job seekers, career changers, or anyone tired of manual job searching.
+
+---
+
+*Built with care by people who know the pain of job hunting. PRs and feedback welcome!*
 - Selenium & BeautifulSoup for web scraping
+
 - Pandas for CSV generation
 
-## Project Structure
-
-\`\`\`
-job_search_app/
-├── backend/
-│   ├── app/
-│   │   ├── main.py           # FastAPI entry point
-│   │   ├── resume_parser.py  # extract text & keywords
-│   │   ├── scraper.py        # scrape job postings
-│   │   ├── matcher.py        # compute embeddings & similarity
-│   │   └── utils.py          # helpers (CSV export)
-│   ├── requirements.txt      # dependencies
-│   └── Dockerfile            # containerization
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── UploadForm.tsx
-│   │   │   ├── ProgressIndicator.tsx
-│   │   │   ├── ResultCard.tsx
-│   │   │   └── DownloadLink.tsx
-│   │   ├── pages/
-│   │   │   └── index.tsx
-│   │   └── styles/
-│   ├── package.json
-│   └── tailwind.config.js
-└── README.md
-\`\`\`
-
-## Getting Started
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-   \`\`\`
-   cd job_search_app/backend
-   \`\`\`
-
-2. Create a virtual environment:
-   \`\`\`
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   \`\`\`
-
-3. Install dependencies:
-   \`\`\`
-   pip install -r requirements.txt
-   \`\`\`
-
-4. Download the spaCy model:
-   \`\`\`
-   python -m spacy download en_core_web_sm
-   \`\`\`
-
-5. Start the backend server:
-   \`\`\`
-   uvicorn app.main:app --reload
-   \`\`\`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   \`\`\`
-   cd job_search_app/frontend
-   \`\`\`
-
-2. Install dependencies:
-   \`\`\`
-   npm install
-   \`\`\`
-
-3. Start the development server:
-   \`\`\`
-   npm run dev
-   \`\`\`
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Docker Deployment
-
-Build and run the backend with Docker:
-
-\`\`\`bash
-cd job_search_app/backend
-docker build -t job-search-backend .
-docker run -p 8000:8000 job-search-backend
-\`\`\`
-
-## Usage
-
-1. Upload your resume (PDF or DOCX format)
-2. Provide a URL to job listings
-3. Wait for the processing to complete
-4. View the ranked job matches
-5. Download the results as CSV
-
-## License
-
-MIT

@@ -96,7 +96,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess, isProcessing =
     formData.append('job_url', jobUrl);
     
     try {
-      const response = await axios.post('/api/submit', formData, {
+      const response = await axios.post('http://localhost:8000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

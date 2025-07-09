@@ -131,6 +131,22 @@ def run_comprehensive_tests():
     logger.info(f"Total jobs scraped across all sites: {total_jobs}")
     logger.info("Tests completed")
 
+def test_improved_scraper_quality():
+    """Test the scraper's job data quality with known static HTML or mock"""
+    logger.info("Testing scraper job data quality")
+    
+    # Use a known static HTML or mock
+    url = "https://example.com/jobs"
+    jobs = scrape_jobs(url)
+    
+    for job in jobs:
+        assert "title" in job and job["title"], "Job title is missing or empty"
+        assert "company" in job and job["company"], "Company name is missing or empty"
+        assert "description" in job, "Job description is missing"
+        # Check for unknown titles/companies
+        assert not job["title"].lower().startswith("unknown"), f"Job title should not be unknown: {job['title']}"
+        assert not job["company"].lower().startswith("unknown"), f"Company name should not be unknown: {job['company']}"
+
 if __name__ == "__main__":
     # Uncomment the test you want to run:
     
@@ -142,3 +158,6 @@ if __name__ == "__main__":
     
     # Test multiple sites
     # run_comprehensive_tests()
+
+    # Test improved scraper quality
+    # test_improved_scraper_quality()

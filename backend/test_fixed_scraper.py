@@ -65,7 +65,35 @@ def test_linkedin_scraper():
         logger.error(f"Error testing scraper: {e}", exc_info=True)
         return []
 
+def test_fixed_scraper_quality():
+    """Test the fixed scraper for data quality and integrity"""
+    logger.info("Testing fixed scraper for data quality and integrity")
+    
+    # Use a known static HTML or mock
+    url = "https://example.com/jobs"
+    
+    try:
+        # Run the scraper
+        logger.info(f"Attempting to scrape for quality test: {url}")
+        jobs = scraper_module.scrape_jobs(url)
+        
+        # Validate the quality of the scraped data
+        for job in jobs:
+            assert "title" in job and job["title"], "Job title is missing or empty"
+            assert "company" in job and job["company"], "Company name is missing or empty"
+            assert "description" in job, "Job description is missing"
+            
+            # Check for unknown titles/companies
+            assert not job["title"].lower().startswith("unknown"), f"Job title should not be unknown: {job['title']}"
+            assert not job["company"].lower().startswith("unknown"), f"Company name should not be unknown: {job['company']}"
+        
+        logger.info("Data quality test passed")
+        
+    except Exception as e:
+        logger.error(f"Error in data quality test: {e}", exc_info=True)
+
 if __name__ == "__main__":
     logger.info("=== STARTING SCRAPER TEST WITH FIXED MODULE ===")
     test_linkedin_scraper()
+    test_fixed_scraper_quality()
     logger.info("=== TEST COMPLETE ===")

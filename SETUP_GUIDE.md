@@ -10,9 +10,10 @@ This application helps job seekers find the best matches for their resumes from 
 
 1. Navigate to the backend directory and create a virtual environment:
    \`\`\`
-   cd backend
+   cd job_search_app/backend
    python -m venv venv
    .\venv\Scripts\activate  # On Windows
+   # On Linux/Mac: source venv/bin/activate
    \`\`\`
 
 2. Install the required dependencies:
@@ -35,7 +36,7 @@ This application helps job seekers find the best matches for their resumes from 
 
 1. Navigate to the frontend directory:
    \`\`\`
-   cd frontend
+   cd job_search_app/frontend
    \`\`\`
 
 2. Install the required dependencies:
@@ -51,10 +52,15 @@ This application helps job seekers find the best matches for their resumes from 
 
 ### Using VS Code Tasks
 
-For convenience, I've created VS Code tasks to run both the frontend and backend:
+For convenience, VS Code tasks are available to run the application:
 
 1. Press `Ctrl+Shift+P` and select "Tasks: Run Task"
-2. Choose "Start Full App" to run both the frontend and backend
+2. Choose from the available tasks:
+   - "Start Backend" - Runs the FastAPI server
+   - "Start Frontend" - Runs the Next.js development server  
+   - "Start Full App" - Runs both frontend and backend simultaneously
+
+Alternatively, you can use the VS Code terminal and run the individual tasks using the task runner tool.
 
 ## Using the Application
 
@@ -81,6 +87,36 @@ For convenience, I've created VS Code tasks to run both the frontend and backend
 - Styling: Tailwind CSS
 - Embeddings: Sentence Transformers (all-MiniLM-L6-v2)
 - Web Scraping: Selenium with BeautifulSoup
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Chrome driver issues**: If you encounter Selenium WebDriver errors, ensure Chrome is installed and up to date. The webdriver-manager should automatically handle ChromeDriver installation.
+
+2. **spaCy model not found**: If you get a model not found error, run:
+   \`\`\`
+   python -m spacy download en_core_web_sm
+   \`\`\`
+
+3. **CORS errors**: The backend is configured to allow frontend connections. If you encounter CORS issues, check that both services are running on their default ports (backend: 8000, frontend: 3000).
+
+4. **Memory issues**: Large resume files or job listing pages may cause memory issues. Consider reducing the scope of job listings or using smaller resume files.
+
+5. **Port conflicts**: If ports 3000 or 8000 are already in use, you can modify the startup commands:
+   - Frontend: `npm run dev -- -p 3001`
+   - Backend: `uvicorn app.main:app --reload --port 8001`
+
+## Environment Variables
+
+The application currently works with default settings, but you may want to create a `.env` file in the backend directory for custom configurations:
+
+\`\`\`
+# Optional environment variables
+BACKEND_HOST=localhost
+BACKEND_PORT=8000
+FRONTEND_URL=http://localhost:3000
+\`\`\`
 
 ## Limitations
 

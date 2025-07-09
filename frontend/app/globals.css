@@ -84,6 +84,16 @@ body {
   .bg-gradient-radial {
     background: radial-gradient(circle, var(--tw-gradient-stops));
   }
+
+  .shadow-cyberpunk {
+    box-shadow: 0 0 24px 4px #00fff7, 0 0 2px 1px #ff00cc inset;
+  }
+  .drop-shadow-cyberpunk {
+    filter: drop-shadow(0 0 6px #00fff7) drop-shadow(0 0 2px #ff00cc);
+  }
+  .animate-cyberpunk-glow {
+    animation: cyberpunk-glow 1.5s infinite alternate;
+  }
 }
 
 @keyframes fadeIn {
@@ -146,5 +156,14 @@ body {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes cyberpunk-glow {
+  from {
+    text-shadow: 0 0 8px #00fff7, 0 0 2px #ff00cc;
+  }
+  to {
+    text-shadow: 0 0 16px #ff00cc, 0 0 4px #00fff7;
   }
 }

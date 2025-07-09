@@ -86,8 +86,30 @@ def test_indeed_scraper():
     except Exception as e:
         logger.error(f"Error testing scraper: {str(e)}", exc_info=True)
 
+def test_no_retry_scraper():
+    """Test the no-retry scraper with a static HTML or mock"""
+    logger.info("Testing no-retry scraper with static HTML")
+    
+    # URL to test
+    url = "https://example.com/jobs"
+    
+    try:
+        # Run the scraper
+        logger.info(f"Attempting to scrape: {url}")
+        jobs = scrape_jobs(url)
+        
+        # Check the result
+        if isinstance(jobs, list):
+            logger.info(f"Scraped {len(jobs)} jobs successfully")
+        else:
+            logger.warning("Scraped data is not in the expected list format")
+            
+    except Exception as e:
+        logger.error(f"Error testing no-retry scraper: {str(e)}", exc_info=True)
+
 if __name__ == "__main__":
     logger.info("Starting scraper tests without retry logic")
     test_linkedin_scraper()
     test_indeed_scraper()
+    test_no_retry_scraper()
     logger.info("Tests completed")

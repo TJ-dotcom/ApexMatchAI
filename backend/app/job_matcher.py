@@ -15,7 +15,7 @@ class JobMatcher:
     symbolic matching and embedding-based semantic similarity.
     """
     
-    def __init__(self, use_cross_encoder: bool = False):
+    def __init__(self, use_cross_encoder: bool = True):
         """
         Initialize the JobMatcher
         
@@ -29,8 +29,10 @@ class JobMatcher:
         if use_cross_encoder:
             try:
                 from sentence_transformers import CrossEncoder
-                self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
-                logger.info("Successfully loaded CrossEncoder model")
+                import torch
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+                self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', device=device)
+                logger.info(f"Successfully loaded CrossEncoder model on device: {device}")
             except Exception as e:
                 logger.error(f"Error loading CrossEncoder model: {str(e)}")
                 self.use_cross_encoder = False

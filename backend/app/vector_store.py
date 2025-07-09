@@ -16,7 +16,9 @@ db = client["job_search"]
 jobs_col = db["jobs"]
 
 # --- Embedding Model (local Hugging Face) ---
-model = SentenceTransformer("all-MiniLM-L6-v2")
+import torch
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = SentenceTransformer("all-MiniLM-L6-v2", device=device)
 
 # --- Local: Add job with embedding ---
 def add_job_local(job_dict):

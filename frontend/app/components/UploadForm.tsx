@@ -2,6 +2,7 @@ import { useState, FormEvent, ChangeEvent, DragEvent } from 'react';
 import axios from 'axios';
 import { DocumentArrowUpIcon, GlobeAltIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import { CyberpunkButton } from "@/components/ui";
 
 interface UploadFormProps {
   onUploadSuccess: (taskId: string) => void;
@@ -106,7 +107,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess, isProcessing =
     formData.append('job_url', jobUrl);
     
     try {
-      const response = await axios.post('/api/submit', formData, {
+      const response = await axios.post('http://localhost:8000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -341,19 +342,13 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess, isProcessing =
           )}
 
           <div className="flex justify-end">
-            <motion.button
+            <CyberpunkButton
               type="submit"
               disabled={loading || isProcessing || !file || !jobUrl}
               className={`px-6 py-3 rounded-md text-white font-medium flex items-center space-x-3
                 ${loading || isProcessing || !file || !jobUrl 
                   ? 'bg-gray-700 cursor-not-allowed opacity-50' 
                   : 'bg-gradient-to-r from-blue-800 to-indigo-900 hover:from-blue-700 hover:to-indigo-800 focus:outline-none neon-border-blue'}`}
-              whileHover={{ 
-                scale: loading || isProcessing || !file || !jobUrl ? 1 : 1.03,
-                boxShadow: loading || isProcessing || !file || !jobUrl ? 'none' : '0 0 20px rgba(59, 130, 246, 0.5)'
-              }}
-              transition={{ duration: 0.2 }}
-              variants={glitchVariants}
             >
               {loading ? (
                 <>
@@ -368,7 +363,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadSuccess, isProcessing =
                   </span>
                 </>
               )}
-            </motion.button>
+            </CyberpunkButton>
           </div>
         </form>
       </div>

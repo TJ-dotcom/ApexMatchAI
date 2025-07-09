@@ -9,10 +9,13 @@ from sentence_transformers import SentenceTransformer
 # Get module logger
 logger = logging.getLogger("job_search_app.matcher")
 
-# Load the sentence transformer model for embeddings
+
+# Load the sentence transformer model for embeddings, always using GPU if available
 try:
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    logger.info(f"Successfully loaded SentenceTransformer model")
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SentenceTransformer('all-MiniLM-L6-v2', device=device)
+    logger.info(f"Successfully loaded SentenceTransformer model on device: {device}")
 except Exception as e:
     logger.error(f"Error loading SentenceTransformer model: {str(e)}", exc_info=True)
     # Create fallback transformer (will not work as well but prevents crash)
@@ -23,7 +26,6 @@ except Exception as e:
                 return np.random.rand(384)  # Single embedding vector
             else:
                 return np.random.rand(len(texts), 384)  # Batch of embedding vectors
-    
     model = FallbackTransformer()
 
 def compute_embeddings(texts: List[str]) -> np.ndarray:

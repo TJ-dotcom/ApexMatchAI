@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import UploadForm from './components/UploadForm';
-import ProgressIndicator from './components/ProgressIndicator';
-import ResultCard from './components/ResultCard';
+import { CyberpunkProgress, CyberpunkResultCard, CyberpunkButton, CyberpunkToaster } from "@/components/ui";
 import DownloadLink from './components/DownloadLink';
 
 interface JobResult {
@@ -82,7 +81,7 @@ export default function Home() {
       return (
         <div className="max-w-xl mx-auto mt-10">
           <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-8">
-            <ProgressIndicator active={true} message="Analyzing your resume and matching with job opportunities..." />
+            <CyberpunkProgress step={1} totalSteps={3} label="Analyzing your resume and matching with job opportunities..." />
           </div>
         </div>
       );
@@ -97,17 +96,16 @@ export default function Home() {
             </p>
             <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
               <DownloadLink csvUrl={results.csv_url} />
-              <button
+              <CyberpunkButton
                 onClick={() => {
                   setTaskId(null);
                   setResults(null);
                   setAppState('initial');
                   if (pollingInterval) clearInterval(pollingInterval);
                 }}
-                className="btn btn-secondary flex items-center"
               >
                 New Search
-              </button>
+              </CyberpunkButton>
             </div>
           </div>
           <div className="mb-8">
@@ -119,7 +117,7 @@ export default function Home() {
               {results.results
                 .sort((a, b) => b.match_score - a.match_score)
                 .map((job, index) => (
-                  <ResultCard key={index} job={job} index={index} />
+                  <CyberpunkResultCard key={index} job={{ ...job, score: job.match_score }} index={index} />
                 ))}
             </div>
           </div>
@@ -132,16 +130,15 @@ export default function Home() {
           <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-8 border-l-4 border-red-500">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Processing Your Request</h3>
             <p className="text-base text-gray-700 dark:text-gray-300 mb-4">{results.error || 'Something went wrong. Please try again.'}</p>
-            <button
+            <CyberpunkButton
               onClick={() => {
                 setTaskId(null);
                 setResults(null);
                 setAppState('initial');
               }}
-              className="btn btn-primary"
             >
               Try Again
-            </button>
+            </CyberpunkButton>
           </div>
         </div>
       );
@@ -188,6 +185,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <CyberpunkToaster />
     </div>
   );
 }
