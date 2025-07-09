@@ -279,170 +279,110 @@ def parse_linkedin(html_content: str, base_url: str) -> List[Dict[str, Any]]:
     logger.info(f"LinkedIn parser extracted {len(jobs)} job listings")
     return jobs
 
+import re
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import logging
+
+logger = logging.getLogger("job_search_app.scraper")
+
 def parse_generic(html_content: str, base_url: str) -> List[Dict[str, Any]]:
-    """Parse generic job listings with multiple heuristic approaches"""
-    logger.info("Starting generic parser (multi-heuristic)")
-    jobs = []
+    """
+    Intelligently parse generic job listings using a scoring-based approach
+    to identify job containers and extract structured data.
+    """
+    logger.info("Starting intelligent generic parser")
     soup = BeautifulSoup(html_content, 'html.parser')
+    jobs = []
+    
+    # Keywords to score potential job containers
+    job_keywords = [
+        'apply', 'engineer', 'developer', 'manager', 'analyst', 'salary', 
+        'full-time', 'part-time', 'contract', 'remote', 'location', 'company'
+    ]
+    
+    # Find all potential containers and score them
+    potential_containers = soup.find_all(['div', 'li', 'tr', 'article'])
+    scored_containers = []
 
-    # --- Heuristic 1: Greenhouse job board ---
-    # Greenhouse jobs: <div class="opening"> or <a class="opening">
-    greenhouse_jobs = soup.find_all('a', class_='opening')
-    if greenhouse_jobs:
-        for a in greenhouse_jobs:
-            title = a.get_text(strip=True)
-            url = urljoin(base_url, a['href'])
+    for container in potential_containers:
+        score = 0
+        text = container.get_text(" ", strip=True).lower()
+        
+        # Skip containers that are too small or too large
+        if not (50 < len(text) < 3000):
+            continue
+
+        # Basic scoring based on keyword presence
+        for keyword in job_keywords:
+            if keyword in text:
+                score += 1
+        
+        # Boost score for elements with job-related classes or IDs
+        class_str = ' '.join(container.get('class', [])).lower()
+        id_str = container.get('id', '').lower()
+        if any(kw in class_str for kw in ['job', 'listing', 'career', 'vacancy']):
+            score += 5
+        if any(kw in id_str for kw in ['job', 'listing']):
+            score += 5
+            
+        if score > 2:  # Set a threshold to consider it a potential job
+             scored_containers.append({'score': score, 'element': container})
+
+    # Sort containers by score to prioritize the most likely candidates
+    sorted_containers = sorted(scored_containers, key=lambda x: x['score'], reverse=True)
+    
+    # Process the top N scored containers to extract job details
+    for item in sorted_containers[:25]: # Limit to the top 25 to reduce noise
+        element = item['element']
+        
+        # --- Smarter Data Extraction ---
+        title = "Unknown Title"
+        company = "Unknown Company"
+        location = "Remote"
+
+        # Strategy for Title: Look for headings first, then links
+        title_elem = element.find(['h1', 'h2', 'h3', 'h4']) or \
+                     element.find('a', class_=re.compile(r'title', re.I))
+        if title_elem:
+            title = title_elem.get_text(strip=True)
+        else: # Fallback to the most prominent link text
+            links = element.find_all('a', href=True)
+            if links:
+                # Assume the link with the longest text is the title
+                title = max([link.get_text(strip=True) for link in links], key=len)
+
+        # Strategy for Company: Look for specific classes or elements near the title
+        company_elem = element.find(class_=re.compile(r'company|organization|employer', re.I))
+        if company_elem:
+            company = company_elem.get_text(strip=True)
+
+        # Strategy for Location: Look for location-specific classes or patterns
+        location_elem = element.find(class_=re.compile(r'location|region', re.I))
+        if location_elem:
+            location = location_elem.get_text(strip=True)
+        else: # Look for text that matches a city, state pattern
+            location_match = re.search(r'\b[A-Z][a-zA-Z\s]+,\s*[A-Z]{2}\b', element.get_text())
+            if location_match:
+                location = location_match.group(0)
+
+        # Strategy for URL: Find the most relevant link
+        link_elem = element.find('a', href=True)
+        job_url = urljoin(base_url, link_elem['href']) if link_elem else base_url
+
+        # --- Final Validation ---
+        # Add job if we found a reasonable title and it's not a duplicate
+        if title != "Unknown Title" and not any(j['title'] == title and j['company'] == company for j in jobs):
             jobs.append({
                 'title': title,
-                'company': '',
-                'location': '',
-                'url': url,
-                'source': 'Greenhouse',
-            })
-        logger.info(f"Greenhouse parser extracted {len(jobs)} job listings")
-        return jobs
-
-    # --- Heuristic 2: Lever job board ---
-    # Lever jobs: <div class="posting"> or <a class="posting-title">
-    lever_jobs = soup.find_all('div', class_='posting')
-    if lever_jobs:
-        for div in lever_jobs:
-            a = div.find('a', class_='posting-title')
-            title = a.get_text(strip=True) if a else None
-            url = urljoin(base_url, a['href']) if a and a.has_attr('href') else None
-            location = ''
-            loc_div = div.find('div', class_='posting-categories')
-            if loc_div:
-                location = loc_div.get_text(strip=True)
-            jobs.append({
-                'title': title,
-                'company': '',
-                'location': location,
-                'url': url,
-                'source': 'Lever',
-            })
-        logger.info(f"Lever parser extracted {len(jobs)} job listings")
-        return jobs
-
-
-    # --- Heuristic 3: Ashby job board ---
-    # Ashby jobs: <a data-testid="job-listing-title-link"> or <div data-testid="job-listing">
-    ashby_jobs = soup.find_all('a', attrs={'data-testid': 'job-listing-title-link'})
-    if ashby_jobs:
-        for a in ashby_jobs:
-            title = a.get_text(strip=True)
-            url = urljoin(base_url, a['href'])
-            # Try to get location from parent or sibling
-            location = ''
-            parent = a.find_parent(attrs={'data-testid': 'job-listing'})
-            if parent:
-                loc_div = parent.find(attrs={'data-testid': 'job-location'})
-                if loc_div:
-                    location = loc_div.get_text(strip=True)
-            jobs.append({
-                'title': title,
-                'company': '',
-                'location': location,
-                'url': url,
-                'source': 'Ashby',
-            })
-        logger.info(f"Ashby parser extracted {len(jobs)} job listings")
-        return jobs
-
-    # --- Heuristic 4: Taleo/Workday/other ATS (very basic) ---
-    # Look for table rows with job links
-    job_rows = soup.find_all('tr')
-    for row in job_rows:
-        a = row.find('a', href=True)
-        if a and ('job' in a['href'] or 'position' in a['href']):
-            title = a.get_text(strip=True)
-            url = urljoin(base_url, a['href'])
-            jobs.append({
-                'title': title,
-                'company': '',
-                'location': '',
-                'url': url,
-                'source': 'TableRow',
-            })
-    if jobs:
-        logger.info(f"Table row parser extracted {len(jobs)} job listings")
-        return jobs
-
-    # --- Heuristic 4: Generic job cards (div or li with job/position/opening in class or id) ---
-    job_cards = []
-    for tag in soup.find_all(['div', 'li', 'section', 'article']):
-        classes = ' '.join(tag.get('class', []))
-        id_ = tag.get('id', '')
-        text = tag.get_text(' ', strip=True).lower()
-        if any(keyword in classes.lower() or keyword in id_.lower() or keyword in text for keyword in ['job', 'position', 'opening', 'career']):
-            job_cards.append(tag)
-
-    for card in job_cards:
-        # Try to find a link
-        a_tag = card.find('a', href=True)
-        title = a_tag.get_text(strip=True) if a_tag else card.get_text(strip=True)[:80]
-        url = urljoin(base_url, a_tag['href']) if a_tag else base_url
-        jobs.append({
-            'title': title,
-            'company': '',
-            'location': '',
-            'url': url,
-            'source': 'GenericCard',
-        })
-    if jobs:
-        logger.info(f"Generic card parser extracted {len(jobs)} job listings")
-        return jobs
-
-
-    # --- MoAIjobs-specific parser (robust, no fallback) ---
-    if "moaijobs.com" in base_url:
-        logger.info("Using MoAIjobs-specific parser (HTML structure-based)")
-        # Extract job title
-        h1 = soup.find('h1', class_=lambda x: x and 'font-bold' in x)
-        job_title = h1.get_text(strip=True) if h1 else None
-
-        # Extract company name
-        company_div = soup.find('div', class_='flex items-center gap-2 font-medium')
-        company = company_div.get_text(strip=True) if company_div else None
-
-        # Extract location (look for map-pin icon and sibling span)
-        location = None
-        loc_divs = soup.find_all('div', class_=lambda x: x and 'text-secondary' in x and 'flex' in x)
-        for div in loc_divs:
-            if div.find('svg', {'class': lambda x: x and 'map-pin' in x}):
-                span = div.find('span')
-                if span:
-                    location = span.get_text(strip=True)
-                    break
-
-        # Find the Job Description section
-        h2 = soup.find('h2', string=lambda t: t and 'Job Description' in t)
-        job_description_html = None
-        job_description_text = None
-        if h2:
-            prose_div = h2.find_next_sibling('div')
-            if prose_div and 'prose' in ' '.join(prose_div.get('class', [])):
-                desc_div = prose_div.find('div', class_='dont-break-out text-justify')
-                if desc_div:
-                    job_description_html = str(desc_div)
-                    job_description_text = desc_div.get_text(separator='\n', strip=True)
-
-        if job_title and company and job_description_text:
-            jobs.append({
-                'title': job_title,
                 'company': company,
                 'location': location,
-                'description_html': job_description_html,
-                'description': job_description_text,
-                'url': base_url,
-                'source': 'MoAIjobs',
+                'description': element.get_text(" ", strip=True)[:300] + "...",
+                'url': job_url,
+                'source': "Generic"
             })
-            logger.info("MoAIjobs parser extracted job posting from HTML structure.")
-            return jobs
-        logger.warning("MoAIjobs parser could not find all required fields using expected HTML structure.")
-        return []
 
-    logger.info("No jobs found with generic heuristics. Returning empty list.")
+    logger.info(f"Intelligent generic parser extracted {len(jobs)} job listings")
     return jobs
 
 def parse_moaijobs_listings(html_content: str, base_url: str) -> List[Dict[str, Any]]:
