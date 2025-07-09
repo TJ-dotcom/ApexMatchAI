@@ -14,7 +14,10 @@ from .task_storage import TaskStorage
 import time
 
 # Configure logging
+
+# Ensure logs directory exists
 import datetime
+os.makedirs("./logs", exist_ok=True)
 log_file = f"./logs/job_search_app_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 logging.basicConfig(
     level=logging.INFO,
@@ -56,9 +59,13 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 RESULTS_DIR = Path("./results")
 RESULTS_DIR.mkdir(exist_ok=True)
 
-# Initialize persistent task storage from our imported module
 task_storage = TaskStorage()
 tasks = task_storage.get_all()
+
+# Helper function to add and persist a task
+def add_task(task_id, task_data):
+    tasks[task_id] = task_data
+    task_storage.add(task_id, task_data)
 
 # --- API endpoints for local semantic search ---
 @app.post("/jobs/add-local")
@@ -133,13 +140,14 @@ async def upload_resume(
         shutil.copyfileobj(resume.file, buffer)
     
     # Store task information
-    tasks[task_id] = {
+    task_data = {
         "status": "processing",
         "file_path": str(file_path),
         "job_url": job_url,
         "results": None,
         "csv_path": None
     }
+    add_task(task_id, task_data)
     
     # Start processing in the background
     asyncio.create_task(process_resume_and_jobs(task_id))
@@ -185,9 +193,9 @@ async def process_resume_and_jobs(task_id: str):
         
         resume_emb = resume_embs[0]
         
-        # Compute embeddings for jobs
-        job_texts = [job["description"] for job in job_listings]
-        job_titles = [job["title"] for job in job_listings]
+        # Compute embeddings for jobs (robust to missing description)
+        job_texts = [job.get("description") or job.get("title") or "" for job in job_listings]
+        job_titles = [job.get("title", "") for job in job_listings]
         job_embs = compute_embeddings(job_texts)
         if job_embs.size == 0:
             raise ValueError("Failed to compute embeddings for job descriptions")
@@ -215,14 +223,18 @@ async def process_resume_and_jobs(task_id: str):
         export_to_csv(results, str(csv_path))
         
         # Update task with results
-        tasks[task_id]["status"] = "completed"
-        tasks[task_id]["results"] = results
-        tasks[task_id]["csv_path"] = str(csv_path)
+        task_data = tasks[task_id]
+        task_data["status"] = "completed"
+        task_data["results"] = results
+        task_data["csv_path"] = str(csv_path)
+        add_task(task_id, task_data)
         
     except Exception as e:
         logger.error(f"Error processing task {task_id}: {str(e)}", exc_info=True)
-        tasks[task_id]["status"] = "failed"
-        tasks[task_id]["error"] = str(e)
+        task_data = tasks[task_id]
+        task_data["status"] = "failed"
+        task_data["error"] = str(e)
+        add_task(task_id, task_data)
 
 
 @app.get("/results/{task_id}")
