@@ -67,11 +67,21 @@ async def add_job_api(job: Dict[str, Any]):
     add_job_local(job)
     return {"status": "ok"}
 
+# --- Local Semantic Search ---
+# The following endpoints are configured for local development using MongoDB and Hugging Face embeddings.
+# To enable cloud integration, uncomment the GCP-related endpoints below and configure your GCP credentials.
+
 # @app.post("/jobs/add-gcp")
 # async def add_job_api_gcp(job: Dict[str, Any]):
 #     """Add a job to the GCP pipeline (commented for local dev)."""
 #     add_job_gcp(job)
 #     return {"status": "ok"}
+
+# @app.get("/jobs/search-gcp")
+# async def search_jobs_api_gcp(query: str, top_k: int = 5):
+#     """Semantic search for jobs using GCP (commented for local dev)."""
+#     results = search_jobs_gcp(query, top_k)
+#     return {"results": results}
 
 @app.get("/jobs/search-local")
 async def search_jobs_api(query: str, top_k: int = 5):

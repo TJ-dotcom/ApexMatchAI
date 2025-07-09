@@ -2,13 +2,28 @@
 Local vector store and semantic search for job listings using MongoDB and Hugging Face embeddings.
 GCP Dataflow/Vertex AI/Cloud Storage code is scaffolded and commented for future cloud migration.
 """
+
+# --- Local Setup ---
+# The following code is configured for local development using MongoDB and Hugging Face embeddings.
+# To enable cloud integration, uncomment the GCP-related sections below and configure your GCP credentials.
+
 from sentence_transformers import SentenceTransformer
 from pymongo import MongoClient
 import numpy as np
 
-# Uncomment and configure for GCP Dataflow/Vertex AI
+# --- GCP Integration (Commented for Local Development) ---
+# Uncomment the following imports and functions to enable GCP integration.
+# Ensure you have the necessary GCP services set up and credentials configured.
 # from google.cloud import storage, aiplatform
 # import apache_beam as beam
+
+# def add_job_gcp(job_dict):
+#     # Upload job to GCS, trigger Dataflow pipeline for embedding/vectorization
+#     pass
+#
+# def search_jobs_gcp(query, top_k=5):
+#     # Use Vertex AI Matching Engine or similar for semantic search
+#     pass
 
 # --- Local MongoDB Setup ---
 client = MongoClient("mongodb://localhost:27017/")
@@ -38,15 +53,6 @@ def search_jobs_local(query, top_k=5):
         scored.append((score, job))
     scored.sort(reverse=True, key=lambda x: x[0])
     return [job for score, job in scored[:top_k]]
-
-# --- GCP Dataflow/Vertex AI/Cloud Storage (scaffolded, commented) ---
-# def add_job_gcp(job_dict):
-#     # Upload job to GCS, trigger Dataflow pipeline for embedding/vectorization
-#     pass
-#
-# def search_jobs_gcp(query, top_k=5):
-#     # Use Vertex AI Matching Engine or similar for semantic search
-#     pass
 
 # Usage example (local):
 # add_job_local({"title": "ML Engineer", "description": "Build ML pipelines..."})

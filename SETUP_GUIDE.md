@@ -9,45 +9,45 @@ This application helps job seekers find the best matches for their resumes from 
 ### Backend Setup
 
 1. Navigate to the backend directory and create a virtual environment:
-   \`\`\`
+   ```
    cd job_search_app/backend
    python -m venv venv
    .\venv\Scripts\activate  # On Windows
    # On Linux/Mac: source venv/bin/activate
-   \`\`\`
+   ```
 
 2. Install the required dependencies:
-   \`\`\`
+   ```
    pip install -r requirements.txt
-   \`\`\`
+   ```
 
 3. Download the spaCy language model:
-   \`\`\`
+   ```
    python -m spacy download en_core_web_sm
-   \`\`\`
+   ```
 
 4. Start the FastAPI backend server:
-   \`\`\`
+   ```
    uvicorn app.main:app --reload
-   \`\`\`
+   ```
    The API will be available at http://localhost:8000
 
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
-   \`\`\`
+   ```
    cd job_search_app/frontend
-   \`\`\`
+   ```
 
 2. Install the required dependencies:
-   \`\`\`
+   ```
    npm install
-   \`\`\`
+   ```
 
 3. Start the development server:
-   \`\`\`
+   ```
    npm run dev
-   \`\`\`
+   ```
    The frontend will be available at http://localhost:3000
 
 ### Using VS Code Tasks
@@ -95,9 +95,9 @@ Alternatively, you can use the VS Code terminal and run the individual tasks usi
 1. **Chrome driver issues**: If you encounter Selenium WebDriver errors, ensure Chrome is installed and up to date. The webdriver-manager should automatically handle ChromeDriver installation.
 
 2. **spaCy model not found**: If you get a model not found error, run:
-   \`\`\`
+   ```
    python -m spacy download en_core_web_sm
-   \`\`\`
+   ```
 
 3. **CORS errors**: The backend is configured to allow frontend connections. If you encounter CORS issues, check that both services are running on their default ports (backend: 8000, frontend: 3000).
 
@@ -107,16 +107,47 @@ Alternatively, you can use the VS Code terminal and run the individual tasks usi
    - Frontend: `npm run dev -- -p 3001`
    - Backend: `uvicorn app.main:app --reload --port 8001`
 
+### Enabling Cloud Integration
+
+To switch from local to cloud setup:
+
+1. Uncomment the relevant sections in `backend/app/vector_store.py` and `backend/app/main.py`.
+2. Install the required GCP libraries:
+   ```
+   pip install google-cloud-storage google-cloud-aiplatform apache-beam
+   ```
+3. Configure your GCP credentials:
+   - Set up a service account with the necessary permissions.
+   - Download the service account key file and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable:
+     ```
+     export GOOGLE_APPLICATION_CREDENTIALS="/path/to/keyfile.json"
+     ```
+
+4. Update the GCP-specific configurations in the code.
+
+### Troubleshooting
+
+#### Local Environment
+- MongoDB connection issues: Ensure MongoDB is running locally and accessible.
+- Backend server errors: Check the logs in the `backend/logs` directory.
+
+#### Cloud Environment
+- GCP authentication errors: Verify the `GOOGLE_APPLICATION_CREDENTIALS` environment variable is set correctly.
+- Dataflow pipeline issues: Check the GCP Dataflow logs for errors.
+- Vertex AI model errors: Ensure the model is deployed and accessible via the specified endpoint.
+
+For additional help, consult the GCP documentation or contact support.
+
 ## Environment Variables
 
 The application currently works with default settings, but you may want to create a `.env` file in the backend directory for custom configurations:
 
-\`\`\`
+```
 # Optional environment variables
 BACKEND_HOST=localhost
 BACKEND_PORT=8000
 FRONTEND_URL=http://localhost:3000
-\`\`\`
+```
 
 ## Limitations
 
